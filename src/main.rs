@@ -1,6 +1,7 @@
 // Declare the other modules so we can use them
-mod ingest;
+mod alpaca;
 mod types;
+mod kraken;
 
 use axum::{
     extract::ws::{Message, WebSocket, WebSocketUpgrade},
@@ -12,7 +13,7 @@ use axum::{
 use std::net::SocketAddr;
 use tokio::sync::broadcast;
 use crate::types::AppState;
-use crate::ingest::ingest_alpaca_stream;
+use crate::alpaca::ingest_alpaca_stream;
 
 #[tokio::main]
 async fn main() {
@@ -22,17 +23,21 @@ async fn main() {
     let api_key = std::env::var("KEY").expect("APCA_API_KEY_ID must be set");
     let api_secret = std::env::var("SECRET").expect("APCA_API_SECRET_KEY must be set");
 
-    // Create the broadcast channel with a capacity of 100 messages
     let (tx, _rx) = broadcast::channel(100);
 
     let app_state = AppState {
         tx: tx.clone()
     };
 
-    // Spawn the background ingestor task
+    // spawn the background ingestor tasks
     let tx_for_ingestor = tx.clone();
     tokio::spawn(async move {
         ingest_alpaca_stream(api_key, api_secret, tx_for_ingestor).await;
+    });
+
+    let tx_kraken = tx.clone();
+    tokio::spawn(async move {
+        kraken::ingest_kraken_stream(tx_kraken).await;
     });
 
     // Build the web server

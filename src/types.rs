@@ -29,3 +29,16 @@ pub struct Response {
 pub struct AppState {
     pub tx: broadcast::Sender<String>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct KrakenTickerUpdate {
+    pub channel: String,
+    pub r#type: String,
+    pub data: Vec<KrakenTickerData>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct KrakenTickerData {
+    pub symbol: String,
+    pub last: f64,
+}

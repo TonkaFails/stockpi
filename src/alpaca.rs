@@ -8,7 +8,7 @@ use url::Url;
 
 const ALPACA_URL: &str = "wss://stream.data.alpaca.markets/v1beta3/crypto/us";
 
-const SYMBOLS: &[&str] = &["BTC/USD"];
+const SYMBOLS: &[&str] = &["BTC/USD", "ETH/USD", "LTC/USD"];
 
 pub async fn ingest_alpaca_stream(key: String, secret: String, tx: broadcast::Sender<String>) {
     let url_str = ALPACA_URL;
