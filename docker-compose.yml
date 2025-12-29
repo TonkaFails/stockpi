@@ -1,0 +1,9 @@
+services:
+  backend:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=sqlite:///app/data/market.db?mode=rwc
+    volumes:
+      - ./db_data:/app/data

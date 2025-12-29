@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use tokio::sync::broadcast;
 
 #[derive(Debug, Deserialize)]
@@ -18,7 +19,7 @@ pub struct AlpacaQuote {
     pub timestamp: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Response {
     pub ticker: String,
     pub price: f64,
@@ -28,6 +29,7 @@ pub struct Response {
 #[derive(Clone)]
 pub struct AppState {
     pub tx: broadcast::Sender<String>,
+    pub db: SqlitePool
 }
 
 #[derive(Debug, Deserialize)]
@@ -41,4 +43,10 @@ pub struct KrakenTickerUpdate {
 pub struct KrakenTickerData {
     pub symbol: String,
     pub last: f64,
+}
+
+#[derive(serde::Deserialize)]
+pub struct HistoryParams {
+    pub ticker: String,
+    pub limit: Option<i64>
 }
